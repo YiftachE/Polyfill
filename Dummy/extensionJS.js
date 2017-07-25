@@ -28,12 +28,11 @@ function drawSpinner(elementId = "inject") {
 function drawListOfPeople(people,elementId = "inject") {
     let inject = $(`#${elementId}`)[0];
     inject.innerHTML = "";
-    var peopleHtml = `<ul class="collection" style="padding-right: 0px;overflow: scroll;height: 100%">`;
+    var peopleHtml = `<ul class="collection" style="padding-right: 0px;overflow-y: visible;height: 50%">`;
     people.forEach((e)=>{
         peopleHtml += `
-        <li class="collection-item">
-      <span class="title">${e.name}</span>
-      <p>${e.title} </p>
+        <li class="collection-item" style="text-align:right">
+        <span class="title">${e.name} - ${e.title}</span>
     </li>`
     });
     peopleHtml += `</ul>`;
