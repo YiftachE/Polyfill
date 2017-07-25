@@ -4,15 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
-
     <title>Leaflet Boilerplate</title>
 
-
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+    <link rel="stylesheet" href="node_modules/leaflet-draw/dist/leaflet.draw.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-
-
-
+    <script src="node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
     <style type="text/css">
         html,
         body {
@@ -23,24 +20,12 @@
             min-height: 100%;
         }
     </style>
-
 </head>
 
 <body>
-
     <div id="map"></div>
+    <script type="text/javascript" src="./leaflet-controls.js"></script>
 
-    <script type="text/javascript">
-        var map = L.map('map').setView([51.505, -0.09], 13);
-
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        L.marker([35,31]).addTo(map)
-            .bindPopup('A pretty Israel.<br> Easily customizable.')
-            .openPopup();
-    </script>
 </body>
 
 </html>
