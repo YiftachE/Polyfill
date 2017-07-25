@@ -168,3 +168,8 @@ ENV/
 !.vscode/extensions.json
 
 # End of https://www.gitignore.io/api/node,python,visualstudiocode
+Chrome Extension/.idea
+node_modules/
+ChromeExtension/.idea/workspace.xml
+ChromeExtension/.idea/modules.xml
+ChromeExtension/.idea/Chrome Extension.iml
