@@ -28,7 +28,7 @@ function getCellIdFromLatAndLng(lat, lng) {
     // return {absLat:flat,absLng:flng}
     if (lat < 0) flat = "-" + flat;
     if (lng < 0) flng = "-" + flng;
-    return `${flat}:${flng}`
+    return `${Number(flat.toString().substr(0, 6)).toFixed(3)}:${Number(flng.toString().substr(0, 6)).toFixed(3)}`
 }
 
 function getCellsIdsOfCurrentBoundingBox() {
