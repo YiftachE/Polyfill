@@ -168,3 +168,4 @@ ENV/
 !.vscode/extensions.json
 
 # End of https://www.gitignore.io/api/node,python,visualstudiocode
+.idea/
