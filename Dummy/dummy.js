@@ -16,45 +16,63 @@ for (var i = 31.814; i < 31.816; i += 0.002) {
     }
 }
 
-function getCellIdFromLatAndLng(lat, lng) {
-    var absLat = Math.abs(lat);
-    var absLng = Math.abs(lng);
-    var flat = 0;
-    var flng = 0;
-    let MATH1 = (Number(absLat) * 100).toString().substr(0, 6);
-    MATH1 * 10 % 10 % 2 === 0 ? flat = MATH1 / 100 : flat = (MATH1 * 10 - 1) / 1000;
-    let MATH2 = (Number(absLng) * 100).toString().substr(0, 6);
-    MATH2 * 10 % 10 % 2 === 0 ? flng = MATH2 / 100 : flng = (MATH2 * 10 - 1) / 1000;
-    // return {absLat:flat,absLng:flng}
-    if (lat < 0) flat = "-" + flat;
-    if (lng < 0) flng = "-" + flng;
-    return `${Number(flat.toString().substr(0, 6)).toFixed(3)}:${Number(flng.toString().substr(0, 6)).toFixed(3)}`
-}
+var editableLayers = new L.FeatureGroup();
+map.addLayer(editableLayers);
 
-function getCellsIdsOfCurrentBoundingBox() {
-    if(map.getZoom() <=17 ) {
-     console.log(`does not support zoom smaller then 18, FUCK YOU`);
-     return;
-    }
-    let cells = [];
-    let {_northEast, _southWest} = map.getBounds();
-    let hips = ((_southWest.lat -_northEast.lat) / 0.002) * ((_southWest.lng - _northEast.lng) / 0.002);
-    console.log(hips)
-    for (var i = _southWest.lat; i < _northEast.lat; i += 0.002) {
-        for (var j = _southWest.lng; j < _northEast.lng; j += 0.002) {
-            console.log(i,j)
-            cells.push(getCellIdFromLatAndLng(i,j));
+//leaflet.draw options
+var options = {
+    position: 'topright',
+    draw: {
+        polyline: {
+            shapeOptions: {
+                color: '#f357a1',
+                weight: 10
+            }
+        },
+        polygon: {
+            allowIntersection: false, // Restricts shapes to simple polygons
+            drawError: {
+                color: '#e1e100', // Color the shape will turn when intersects
+                message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+            },
+            shapeOptions: {
+                color: '#bada55'
+            }
+        },
+        circle: false, // Turns off this drawing tool
+        rectangle: {
+            shapeOptions: {
+                clickable: false
+            }
         }
+    },
+    edit: {
+        featureGroup: editableLayers, //REQUIRED!!
+        remove: false
     }
-    return cells;
-}
+};
 
-map.on('click', function (e) {
-    var popLocation = e.latlng;
-    console.log(popLocation)
-    var cellId = getCellIdFromLatAndLng(popLocation.lat, popLocation.lng);
-    L.popup()
-        .setLatLng(popLocation)
-        .setContent(`${popLocation.lat.toFixed(3)}:${popLocation.lng.toFixed(3)}<br/><br/><br/>${cellId}`)
-        .openOn(map);
+var drawControl = new L.Control.Draw(options);
+map.addControl(drawControl);
+
+map.on(L.Draw.Event.CREATED, function (e) {
+    var type = e.layerType,
+        layer = e.layer;
+
+    if (type === 'marker') {
+        layer.bindPopup('A popup!');
+    }
+
+    editableLayers.addLayer(layer);
 });
+
+
+// map.on('click', function (e) {
+//     var popLocation = e.latlng;
+//     console.log(popLocation)
+//     var cellId = getCellIdFromLatAndLng(popLocation.lat, popLocation.lng);
+//     L.popup()
+//         .setLatLng(popLocation)
+//         .setContent(`${popLocation.lat.toFixed(3)}:${popLocation.lng.toFixed(3)}<br/><br/><br/>${cellId}`)
+//         .openOn(map);
+// });
