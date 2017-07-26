@@ -1,9 +1,25 @@
 if(L !== undefined) {
 
 
+
+    function getCellIdFromLatAndLng(lat, lng){
+        var absLat = Math.abs(lat);
+        var absLng = Math.abs(lng);
+        var flat = 0;
+        var flng = 0;
+        let MATH1 = (Number(absLat) * 100).toString().substr(0, 6);
+        MATH1 * 10 % 10 % 2 === 0 ? flat = MATH1 / 100 : flat = (MATH1 * 10 - 1) / 1000;
+        let MATH2 = (Number(absLng) * 100).toString().substr(0, 6);
+        MATH2 * 10 % 10 % 2 === 0 ? flng = MATH2 / 100 : flng = (MATH2 * 10 - 1) / 1000;
+        // return {absLat:flat,absLng:flng}
+        if (lat < 0) flat = "-" + flat;
+        if (lng < 0) flng = "-" + flng;
+        return `${Number(flat.toString().substr(0, 6)).toFixed(3)}:${Number(flng.toString().substr(0, 6)).toFixed(3)}`
+    }
+
     function getCellsIdsOfCurrentBoundingBox() {
         if (tmp_map.getZoom() <= 17) {
-            console.log(`does not support zoom smaller then 18, FUCK YOU`);
+            // console.log(`does not support zoom smaller then 18`);
             return;
         }
         let cells = [];
@@ -52,7 +68,12 @@ if(L !== undefined) {
 
     var devicename = guid(),
         ehROIClient,
-        ehActionClient;
+        ehActionClient,
+        ROIInterval,
+        getStatusInterval,
+        apiUrl = "https://polyfill.azurewebsites.net/api/GetCells?code=JDvdaEoLYZHQNoJBVHj9dmtJdqsgP49QaohUIBak1qaGYUqVJG5/CA==",
+        ROI_TIME = 1000,
+        GET_STATUS_TIME = 5000;
 
     initEHs();
 
@@ -64,8 +85,8 @@ if(L !== undefined) {
     }
 
 
-
-    setInterval(function () {
+    //send RoI data
+    ROIInterval = setInterval(function () {
         let cells = getCellsIdsOfCurrentBoundingBox();
         for(i in cells){
             let cell = cells[i];
@@ -80,6 +101,37 @@ if(L !== undefined) {
             ehROIClient.sendMessage(msg);
         }
 
-    }, 1000);
+    }, ROI_TIME);
+
+    //send Action data
+    tmp_map.on(L.Draw.Event.CREATED, function (e) {
+        if(e.layerType == "marker") {
+            var layer = e.layer;
+            var lat = layer.getLatLng().lat;
+            var lng = layer.getLatLng().lng;
+
+            var ActionEventBody = {
+                "USER_NAME": devicename,
+                "LAT": lat,
+                "LON": lng,
+                "APP_NAME": "NEW_APP"
+            };
+            var msg = new EventData(ActionEventBody);
+
+            ehActionClient.sendMessage(msg,function(res){
+                console.log(res);
+            });
+        }
+    });
+
+
+
+    getStatusInterval = setInterval(function(){
+        var cells = getCellsIdsOfCurrentBoundingBox();
+
+        $.post(apiUrl, JSON.stringify(cells)).done(function(res){
+            console.log(res);
+        });
+    },GET_STATUS_TIME)
 
 }

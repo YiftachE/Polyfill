@@ -2,7 +2,7 @@
  * Created by itamar on 26/07/2017.
  */
 
-var scripts = ["libs/servicebusjssdk-1.2.min.js","content.js"]
+var scripts = ["libs/servicebusjssdk-1.2.min.js","libs/jquery-3.2.1.min.js","content.js"]
 
 for(i in scripts){
     var scriptPath = scripts[i];

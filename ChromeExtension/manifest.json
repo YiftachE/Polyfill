@@ -15,5 +15,5 @@
       "js": ["injector.js"]
     }
   ],
-  "web_accessible_resources": ["libs/servicebusjssdk-1.2.min.js","content.js"]
+  "web_accessible_resources": ["libs/servicebusjssdk-1.2.min.js","libs/jquery-3.2.1.min.js","content.js"]
 }
