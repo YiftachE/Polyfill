@@ -1,145 +1,103 @@
 ﻿var Q = require("q");
-var easyConfig = require('easy-config');
-var RoIEventHubs = require('./client.js');
-var ActionEventHubs = require('./client.js');
+var gaussian = require('gaussian')
+var https = require('https');
 
-// Full Event Hub publisher URI
-var config;
-var eventHubsUri;
-var sasToken;
-
-var config = easyConfig.loadConfig();
-
-if (!config.EventHubsNamespace) {
-    throw new Error("Config file not found, or you forgot to set the namespace in the config.");
-}
-
-var eventHubsNamespace = config.EventHubsNamespace,
-    ActionEventHubsHubName = config.ActionEventHubsHubName,
-    ActionEventHubsKeyName = config.ActionEventHubsKeyName,
-    ActionEventHubsKey = config.ActionEventHubsKey,
-    RoIEventHubsHubName = config.RoIEventHubsHubName,
-    RoIEventHubsKeyName = config.RoIEventHubsKeyName,
-    RoIEventHubsKey = config.RoIEventHubsKey,
-    sasToken = config.SasToken,
-    deviceId = config.DeviceName;
-
-// testSendContinuous();
-testSendPerformance();
-//example1();
-//exampleWithSasToken();
-
-function rnd(a,b){
+function rnd(a, b) {
     return Math.round(Math.random() * (b - a)) + a;
 }
 
+var cells = [{
+    lon: 34.753532409668,
+    lat: 32.0441687907779
+}, {
+    lon: 34.7782516479492,
+    lat: 32.0133161235938
+}, {
+    lon: 34.7785949707031,
+    lat: 32.0610460389255
+}, {
+    lon: 34.789924621582,
+    lat: 32.1003172308259
+}, {
+    lon: 34.8122406005859,
+    lat: 31.9970124064237
+}, {
+    lon: 34.8125839233399,
+    lat: 32.0447508166687
+}, {
+    lon: 34.8451995849609,
+    lat: 32.0735564719067
+}, {
+    lon: 34.8839950561524,
+    lat: 31.9926448470134
+}, {
+    lon: 34.892578125,
+    lat: 32.1328849660839
+}, {
+    lon: 34.9148941040039,
+    lat: 32.0636646432517
+}];
 
-function sendActionData(eh,silent) {
-    var deferral = Q.defer();
-
-    var payload = {
-        USER_NAME: "name" + rnd(1,20),
-        LAT: 12.12 + rnd(1,10),
-        LON: 23.32 + rnd(1,10),
-        APP_NAME: rnd(1,2) == 1 ? 'APP_A' : 'APP_B'
+function getCloseCoordinates(coordinates) {
+    return {
+        long: (coordinates.long - gaussian(10, 10).ppf(Math.random()) / 10000).toFixed(3),
+        lat: (coordinates.lat - gaussian(10, 10).ppf(Math.random()) / 10000).toFixed(3),
     }
-
-    eh.sendMessage({
-        message: payload,
-        deviceId: deviceId,
-    }).then(function () {
-        if (!silent) console.log('Sent ' + JSON.stringify(payload));
-        deferral.resolve();
-    }).catch(function (error) {
-        if (!silent) console.log('Error sending message: ' + error);
-        deferral.reject(error);
-    })
-        .done();
-
-    return deferral.promise;
 }
 
-var cells = ["31.814:34.638", "31.814:34.64", "31.814:34.642", "31.814:34.644"];
-
-function sendRoIData(eh,silent) {
-    var deferral = Q.defer();
-
+function sendUserData() {
+    var coords = getCloseCoordinates(cells[rnd(0, 9)])
     var payload = {
-        USER_NAME: "name" + rnd(1,20),
-        CELL_ID: cells[rnd(0,3)],
-        APP_NAME: rnd(1,2) == 1 ? 'APP_A' : 'APP_B'
+        USER_NAME: "bot" + rnd(1, 4999),
+        lat: coords.lat,
+        lon: coords.long,
+        APP_NAME: "App" + rnd(1, 4999)
     }
-
-    eh.sendMessage({
-        message: payload,
-        deviceId: deviceId,
-    }).then(function () {
-        if (!silent) console.log('Sent ' + JSON.stringify(payload));
-        deferral.resolve();
-    }).catch(function (error) {
-        if (!silent) console.log('Error sending message: ' + error);
-        deferral.reject(error);
-    })
-        .done();
-
-    return deferral.promise;
+    var options = {
+        host: 'polyfill.azurewebsites.net',
+        port: 443,
+        path: '/api/QueueTriggerJS1?code=6X7lJKDutncfo0NK0PADjaU4D1t8HjhnVsNoJ4cJkTmeF9uaWlHhDA==&user=' + payload.USER_NAME + "&cell=" + payload.lat + ":" + payload.lon + "&app=" + payload.APP_NAME
+    }
+    https.get(options, function (resp) {
+        resp.on('data', function (chunk) {
+            //do something with chunk
+        });
+    }).on("error", function (e) {
+        console.log("Got error: " + e.message);
+    });
 }
 
+function sendActionData() {
+    var coords = getCloseCoordinates(cells[rnd(0, 9)])
+    var payload = {
+        USER_NAME: "bot" + rnd(1, 4999),
+        lat: coords.lat,
+        lon: coords.long,
+        APP_NAME: "App" + rnd(1, 3)
+    }
 
+    var options = {
+        host: 'polyfill.azurewebsites.net',
+        port: 443,
+        path: '/api/HttpTriggerJS1?code=fiGOcOYBQwwq1hNrxRit/rMQQ4h88msT5qHv2Bn8DVrii/PtemyK3w==&user=' + payload.USER_NAME + "&lon=" + payload.lat + "&lat=" + payload.lon + "&app=" + payload.APP_NAME
+    };
 
-function testSendPerformance() {
-    var i,
-        start = new Date(),
-        end,
-        promise1,
-        promide2,
-        promises = [],
-        iterations = 100;
-
-
-    RoIEventHubs.init({
-        hubNamespace: eventHubsNamespace,
-        hubName: RoIEventHubsHubName,
-        keyName: RoIEventHubsKeyName,
-        key: RoIEventHubsKey
+    https.get(options, function (resp) {
+        resp.on('data', function (chunk) {
+            //do something with chunk
+        });
+    }).on("error", function (e) {
+        console.log("Got error: " + e.message);
     });
 
-    var it = setInterval(function(){
-        promise1 = sendRoIData(RoIEventHubs,false);
-        promises.push(promise1);
-    },3000)
-
-    setTimeout(function(){
-        clearInterval(it);
-        Q.allSettled(promises).then(function () {
-            ActionEventHubs.init({
-                hubNamespace: eventHubsNamespace,
-                hubName: ActionEventHubsHubName,
-                keyName: ActionEventHubsKeyName,
-                key: ActionEventHubsKey
-            });
-
-            promises = [];
-            var it2 = setInterval(function(){
-                promise2 = sendActionData(ActionEventHubs,false);
-                promises.push(promise2);
-            },3000)
-
-            setTimeout(function(){
-                clearInterval(it2);
-                Q.allSettled(promises).then(function () {
-                    end = new Date();
-                    var elapsed = end.getTime() - start.getTime();
-                    console.log('Test Complete. Took ' + elapsed + 'ms to send ' + iterations + 'messages');
-                    console.log(elapsed / iterations + 'ms / message');
-                    console.log(1000 / (elapsed / iterations) + ' messages / second');
-                });
-            },30000)
-
-        });
-    },30000)
-
-
-
+}
+(function myLoop(i) {
+    setTimeout(function () {
+        sendActionData()
+        if (--i) myLoop(i);
+    }, 3000)
+}())
+for (var i = 0; i < 10000; i++) {
+    sendUserData()
 
 }
