@@ -12,7 +12,8 @@
   "content_scripts": [
     {
       "matches": ["http://*/*","https://*/*"],
-      "js": ["content.js"]
+      "js": ["injector.js"]
     }
-  ]
+  ],
+  "web_accessible_resources": ["libs/servicebusjssdk-1.2.min.js","content.js"]
 }
