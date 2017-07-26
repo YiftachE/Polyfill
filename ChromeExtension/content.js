@@ -133,6 +133,10 @@ if(L !== undefined) {
         var cells = getCellsIdsOfCurrentBoundingBox();
 
         $.post(apiUrl, JSON.stringify(cells)).done(function(res){
+            res.Actions = _.without(res.Actions, _.findWhere(res.Actions, {
+                UserName: name
+            }));
+            res.Viewers = _.without(res.Viewers, name);
             if(!_.isEmpty(_.difference(viewers, res.Viewers)) || !_.isEmpty(_.difference(res.Viewers, viewers))){
                 viewers = res.Viewers;
                 drawListOfPeople(viewers);

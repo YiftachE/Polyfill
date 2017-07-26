@@ -5,16 +5,16 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 
 //31.8147358, 34.6448723
 //31.8147632, 34.6475974
-for (var i = 31.814; i < 31.816; i += 0.002) {
-    for (var j = +34.644; j < 34.648; j += 0.002) {
-        L.polygon([
-            [i, j],
-            [i + 0.002, j],
-            [i + 0.002, j + 0.002],
-            [i, j + 0.002]
-        ]).bindTooltip(`${(i).toFixed(3)}:${(j).toFixed(3)}`).addTo(map)
-    }
-}
+// for (var i = 31.814; i < 31.816; i += 0.002) {
+//     for (var j = +34.644; j < 34.648; j += 0.002) {
+//         L.polygon([
+//             [i, j],
+//             [i + 0.002, j],
+//             [i + 0.002, j + 0.002],
+//             [i, j + 0.002]
+//         ]).bindTooltip(`${(i).toFixed(3)}:${(j).toFixed(3)}`).addTo(map)
+//     }
+// }
 
 var editableLayers = new L.FeatureGroup();
 map.addLayer(editableLayers);
