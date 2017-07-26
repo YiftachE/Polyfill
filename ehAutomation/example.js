@@ -5,7 +5,7 @@ var https = require('https');
 function rnd(a, b) {
     return Math.round(Math.random() * (b - a)) + a;
 }
-
+var specialCells=[{lon:34.772,lat:32.012},{lon:34.776,lat:32.012}]
 var cells = [{
     lon: 34.753532409668,
     lat: 32.0441687907779
@@ -40,17 +40,23 @@ var cells = [{
 
 function getCloseCoordinates(coordinates) {
     return {
-        long: (coordinates.long - gaussian(10, 10).ppf(Math.random()) / 10000).toFixed(3),
+        lon: (coordinates.lon - gaussian(10, 10).ppf(Math.random()) / 10000).toFixed(3),
         lat: (coordinates.lat - gaussian(10, 10).ppf(Math.random()) / 10000).toFixed(3),
     }
 }
-
+function getCloseCoordinatesPoint(coordinates) {
+    return {
+        lon: (coordinates.lon - gaussian(10, 10).ppf(Math.random()) / 10000),
+        lat: (coordinates.lat - gaussian(10, 10).ppf(Math.random()) / 10000),
+    }
+}
 function sendUserData() {
+    
     var coords = getCloseCoordinates(cells[rnd(0, 9)])
     var payload = {
         USER_NAME: "bot" + rnd(1, 4999),
         lat: coords.lat,
-        lon: coords.long,
+        lon: coords.lon,
         APP_NAME: "App" + rnd(1, 4999)
     }
     var options = {
@@ -68,11 +74,11 @@ function sendUserData() {
 }
 
 function sendActionData() {
-    var coords = getCloseCoordinates(cells[rnd(0, 9)])
+    var coords1 = specialCells[0]
     var payload = {
         USER_NAME: "bot" + rnd(1, 4999),
-        lat: coords.lat,
-        lon: coords.long,
+        lat: coords1.lon,
+        lon: coords1.lat,
         APP_NAME: "App" + rnd(1, 3)
     }
 
@@ -81,7 +87,7 @@ function sendActionData() {
         port: 443,
         path: '/api/HttpTriggerJS1?code=fiGOcOYBQwwq1hNrxRit/rMQQ4h88msT5qHv2Bn8DVrii/PtemyK3w==&user=' + payload.USER_NAME + "&lon=" + payload.lat + "&lat=" + payload.lon + "&app=" + payload.APP_NAME
     };
-
+    console.log(payload)
     https.get(options, function (resp) {
         resp.on('data', function (chunk) {
             //do something with chunk
@@ -89,15 +95,67 @@ function sendActionData() {
     }).on("error", function (e) {
         console.log("Got error: " + e.message);
     });
+    var coords2 = specialCells[1]
+    var payload = {
+        USER_NAME: "bot" + rnd(1, 4999),
+        lat: coords2.lon,
+        lon: coords2.lat,
+        APP_NAME: "App" + rnd(1, 3)
+    }
+
+    var options = {
+        host: 'polyfill.azurewebsites.net',
+        port: 443,
+        path: '/api/HttpTriggerJS1?code=fiGOcOYBQwwq1hNrxRit/rMQQ4h88msT5qHv2Bn8DVrii/PtemyK3w==&user=' + payload.USER_NAME + "&lon=" + payload.lat + "&lat=" + payload.lon + "&app=" + payload.APP_NAME
+    };
+    console.log(payload)
+    https.get(options, function (resp) {
+        resp.on('data', function (chunk) {
+            //do something with chunk
+        });
+    }).on("error", function (e) {
+        console.log("Got error: " + e.message);
+    });
+    // });
+    // var coords = getCloseCoordinatesPoint(cells[rnd(0, 9)])
+    // var payload = {
+    //     USER_NAME: "bot" + rnd(1, 4999),
+    //     lat: coords.lon,
+    //     lon: coords.lat,
+    //     APP_NAME: "App" + rnd(1, 3)
+    // }
+
+    // var options = {
+    //     host: 'polyfill.azurewebsites.net',
+    //     port: 443,
+    //     path: '/api/HttpTriggerJS1?code=fiGOcOYBQwwq1hNrxRit/rMQQ4h88msT5qHv2Bn8DVrii/PtemyK3w==&user=' + payload.USER_NAME + "&lon=" + payload.lat + "&lat=" + payload.lon + "&app=" + payload.APP_NAME
+    // };
+    // console.log(payload)
+    // https.get(options, function (resp) {
+    //     resp.on('data', function (chunk) {
+    //         //do something with chunk
+    //     });
+    // }).on("error", function (e) {
+    //     console.log("Got error: " + e.message);
+    // });
 
 }
 (function myLoop(i) {
     setTimeout(function () {
-        sendActionData()
+        console.log(i);
+        sendActionData();
         if (--i) myLoop(i);
-    }, 3000)
-}())
-for (var i = 0; i < 10000; i++) {
-    sendUserData()
+    }, 300)
+}(100000));
+(function myLoop2(j) {
+    setTimeout(function () {
+        console.log(j);
+        sendUserData();
+        if (--j) myLoop2(j);
+    }, 500)
+}(100000));
+// for (var i = 0; i < 10000; i++) {
+    // console.log(i)
+    
 
-}
+// }

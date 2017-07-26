@@ -1,0 +1,15 @@
+{
+  "name": "dummy_map",
+  "version": "1.0.0",
+  "description": "",
+  "main": "leaflet-controls.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "live-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "leaflet-draw": "^0.4.10"
+  }
+}
