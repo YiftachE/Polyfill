@@ -38,7 +38,7 @@ function drawListOfPeople(people, elementId = "listOfPeople") {
     people.forEach((e) => {
         peopleHtml += `
         <li class="collection-body" style="text-align:right;">
-        <span class="title" style="font-size: larger;font-weight: bold;">${e.name}</span><hr></li>`
+        <span class="title" style="font-size: larger;font-weight: bold;">${e}</span><hr></li>`
     });
     peopleHtml += `</ul></div>`;
     inject.insertAdjacentHTML('afterbegin', peopleHtml)
@@ -63,6 +63,10 @@ function drawListOfActions(actions, elementId = "listOfActions") {
 
     let inject = $(`#${elementId}`)[0];
     inject.innerHTML = "";
+
+    $(document).off('mouseenter', '.action-bulet', draw)
+    $(document).off('mouseleave', '.action-bulet', remove)
+
     var actionHtml = `<div class="collapsible-header" style="direction: rtl;background: #3D9970;color: white;"><i class="material-icons">language</i>&thinsp;	${actions.length} ארועים חדשים&thinsp;</div>
               <div class="collapsible-body">
     <ul class="collection" style="padding-right: 0px;overflow-y: visible;height: 50%;color: #3D9970">`;
@@ -70,58 +74,52 @@ function drawListOfActions(actions, elementId = "listOfActions") {
     actions.forEach((e, index) => {
         actionHtml += `
         <li class="collection-body action-bulet" style="text-align:right" index = ${index} 
-        onmouseenter=drawPlaceMark.bind(this,${index},${e.point.x},${e.point.y}) onmouseleave=removeMark.bind(this,${index})
+        onmouseenter=drawPlaceMark.bind(this,${index},${e.Point.x},${e.Point.y}) onmouseleave=removeMark.bind(this,${index})
         >
-        <span class="title" style="font-size: larger;font-weight: bold;">${e.name}</span>
-        <span style="font-size: medium;font-weight: lighter;">${e.appName}</span><hr>
+        <span class="title" style="font-size: larger;font-weight: bold;">${e.UserName}</span>
+        <span style="font-size: medium;font-weight: lighter;">${e.AppName}</span><hr>
         </li>`
     });
     actionHtml += `</ul></div>`;
     inject.insertAdjacentHTML('afterbegin', actionHtml)
 
-    $(document).on('mouseenter', '.action-bulet', function (e) {
-        var index = e.currentTarget.getAttribute("index")
-        drawPlaceMark(index,actions[index].point.x,actions[index].point.y)
-    })
-    $(document).on('mouseleave', '.action-bulet', function (e) {
-        var index = e.currentTarget.getAttribute("index")
-        removeMark(index)
-    })
+    $(document).on('mouseenter', '.action-bulet', draw)
+    $(document).on('mouseleave', '.action-bulet', remove)
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function draw(e) {
+    var index = e.currentTarget.getAttribute("index")
+    drawPlaceMark(index,actions[index].Point.x,actions[index].Point.y)
+}
+
+function remove(e) {
+    var index = e.currentTarget.getAttribute("index")
+    removeMark(index)
+}
+
+
     document.body.insertAdjacentHTML('afterbegin', side);
-    drawListOfPeople([{
-        name: 'רונן אלפחורסי'
-    }, {
-        name: 'מירב טלולית אהרון'
-    }])
-
-    drawListOfActions([{
-        name: 'בני הכניס נקודה',
-        point: {x: 31.814198306580906, y: 34.641212224960334},
-        appName: "אינפינטי"
-    }, {
-        name: 'שרון עדכנה רשומה',
-        point: {x: 31.815198306580906, y: 34.642212224960334},
-        appName: "אינפינטי"
-    }, {
-        name: 'משה קנה פרה'
-        , point: {x: 35, y: 32},
-        appName: "מסע עולמי"
-        ,
-    }])
-
-    setTimeout(() => {
-        map.on("movestart", (e) => {
-            drawSpinner()
-        })
-        map.on("moveend", (e) => {
-            drawListOfPeople([{
-                name: 'דורי אברהם',
-            }, {
-                name: 'ויזר אהרון',
-            }])
-        })
-    }, 1000)
+$(document).ready(function(){
+    $('.collapsible').collapsible();
 });
+// drawListOfPeople([{
+//         name: 'רונן אלפחורסי'
+//     }, {
+//         name: 'מירב טלולית אהרון'
+//     }])
+//
+//     drawListOfActions([{
+//         name: 'בני הכניס נקודה',
+//         point: {x: 31.814198306580906, y: 34.641212224960334},
+//         appName: "אינפינטי"
+//     }, {
+//         name: 'שרון עדכנה רשומה',
+//         point: {x: 31.815198306580906, y: 34.642212224960334},
+//         appName: "אינפינטי"
+//     }, {
+//         name: 'משה קנה פרה'
+//         , point: {x: 35, y: 32},
+//         appName: "מסע עולמי"
+//         ,
+//     }])
+

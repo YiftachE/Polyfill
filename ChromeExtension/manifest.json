@@ -2,9 +2,7 @@
   "manifest_version":2,
   "name":"Mapper",
   "version":"1.0",
-  "background": {
-    "scripts": ["libs/servicebusjssdk-1.2.min.js","libs/jquery-3.2.1.min.js","bg.js"]
-  },
+
   "browser_action": {
     "default_icon": "imgs/globe-map-icon.png",
     "default_popup": "popup.html"
@@ -15,5 +13,5 @@
       "js": ["injector.js"]
     }
   ],
-  "web_accessible_resources": ["libs/servicebusjssdk-1.2.min.js","libs/jquery-3.2.1.min.js","content.js"]
+  "web_accessible_resources": ["libs/underscore-min.js","libs/servicebusjssdk-1.2.min.js","libs/jquery-3.2.1.min.js","content.js","extensionJS.js"]
 }

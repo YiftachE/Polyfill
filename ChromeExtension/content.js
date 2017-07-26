@@ -1,6 +1,6 @@
 if(L !== undefined) {
 
-
+    var name = "schneid_" + Math.round(Math.random() * 100)
 
     function getCellIdFromLatAndLng(lat, lng){
         var absLat = Math.abs(lat);
@@ -92,9 +92,9 @@ if(L !== undefined) {
             let cell = cells[i];
 
             var ROIeventBody = {
-                "USER_NAME" : devicename,
+                "USER_NAME" : name,
                 "CELL_ID" : cell,
-                "APP_NAME" : "APP_A"
+                "APP_NAME" : "NEW_APP"
             };
             var msg = new EventData(ROIeventBody);
 
@@ -111,26 +111,36 @@ if(L !== undefined) {
             var lng = layer.getLatLng().lng;
 
             var ActionEventBody = {
-                "USER_NAME": devicename,
+                "USER_NAME": name,
                 "LAT": lat,
                 "LON": lng,
                 "APP_NAME": "NEW_APP"
             };
             var msg = new EventData(ActionEventBody);
-
+            console.log(JSON.stringify(ActionEventBody))
             ehActionClient.sendMessage(msg,function(res){
                 console.log(res);
             });
         }
     });
 
-
+    var viewers =[],
+        actions = [];
+    drawListOfPeople(viewers);
+    drawListOfActions(actions);
 
     getStatusInterval = setInterval(function(){
         var cells = getCellsIdsOfCurrentBoundingBox();
 
         $.post(apiUrl, JSON.stringify(cells)).done(function(res){
-            console.log(res);
+            if(!_.isEmpty(_.difference(viewers, res.Viewers)) || !_.isEmpty(_.difference(res.Viewers, viewers))){
+                viewers = res.Viewers;
+                drawListOfPeople(viewers);
+            }
+            if(!_.isEmpty(_.difference(actions, res.Actions)) || !_.isEmpty(_.difference(res.Actions, actions))) {
+                actions = res.Actions;
+                drawListOfActions(actions);
+            }
         });
     },GET_STATUS_TIME)
 
